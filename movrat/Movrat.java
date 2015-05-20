@@ -14,8 +14,6 @@ public class Movrat {
     public static int filmRating;
 
     public static void main(String[] args) {
-        /* please make sure, that your source file and input file lives in the same directory
-           or specify an absolute path to your input file */
         readDataFromFile("movrat.in");
         Arrays.sort(estimates);
         discardFalseReviews();
