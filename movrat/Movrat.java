@@ -33,32 +33,12 @@ public class Movrat {
             System.exit(0);
         }
         N = scanner.nextInt();
-        if ((N < 1) || (N > 10000000)) {
-            System.out.println("Incorrect number of estimates.");
-            System.exit(0);
-        }
         estimates = new int[N];
         for (int i = 0; i < N; i++) {
             estimates[i] = scanner.nextInt();
-            if ((estimates[i] < 0) || (estimates[i] > 100)) {
-                System.out.println("Incorrect estimate.");
-                System.exit(0);
-            }
         }
         lowIgnoreCount = scanner.nextInt();
-        if ((lowIgnoreCount < 0) || (lowIgnoreCount > 99)) {
-            System.out.println("Incorrect value of lowIgnoreCount.");
-            System.exit(0);
-        }
         highIgnoreCount = scanner.nextInt();
-        if ((highIgnoreCount < 0) || (highIgnoreCount > 99)) {
-            System.out.println("Incorrect value of highIgnoreCount.");
-            System.exit(0);
-        }
-        if ((lowIgnoreCount + highIgnoreCount) >= N) {
-            System.out.println("Sum of lowIgnoreCount and highIgnoreCount must be less than number of estimates.");
-            System.exit(0);
-        }
         scanner.close();
     }
 
