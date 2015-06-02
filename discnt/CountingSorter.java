@@ -22,7 +22,7 @@ public class CountingSorter {
     private static void createOutputArray() {
         int counterIndex = 0;
         for (int i = 0; i < array.size(); i++) {
-            while (counterArray[counterIndex] == 0) {
+            if (counterArray[counterIndex] == 0) {
                 counterIndex++;
             }
             array.set(i, counterIndex);
