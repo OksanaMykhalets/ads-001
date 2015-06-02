@@ -42,7 +42,7 @@ public class Lngpok {
             scanner.close();
         } catch (FileNotFoundException e) {
             System.out.println("Input file wasn`t found.");
-            System.exit(0);
+            System.exit(42);
         }
     }
 
@@ -84,7 +84,7 @@ public class Lngpok {
             fileWriter.close();
         } catch (IOException e) {
             System.out.println("Can't save result.");
-            System.exit(0);
+            System.exit(42);
         }
     }
 
