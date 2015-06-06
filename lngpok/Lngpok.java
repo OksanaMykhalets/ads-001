@@ -47,29 +47,34 @@ public class Lngpok {
     }
 
     public static void calculateTheLongestSequence() {
-        for (int i = 0; i < cardsValue.size() - 1; i++) {
-            int tmpLengthOfTheLongestSequence = 1;
-            int tmpNumberOfJokers = numberOfJokers;
-            int stepOfSequence = 1;
-            int currentIndex = i;
-            while (currentIndex < cardsValue.size() - 1) {
-                if (cardsValue.get(currentIndex + 1) == cardsValue.get(currentIndex) + stepOfSequence) {
-                    tmpLengthOfTheLongestSequence += 1;
-                    stepOfSequence = 1;
-                    currentIndex++;
-                } else if (tmpNumberOfJokers > 0) {
-                    tmpLengthOfTheLongestSequence += 1;
-                    tmpNumberOfJokers--;
-                    stepOfSequence++;
-                } else {
-                    break;
+        if (cardsValue.size() <= 1) {
+    		lengthOfTheLongestSequence = cardsValue.size() + numberOfJokers;
+    	}
+    	else {
+    		for (int i = 0; i < cardsValue.size() - 1; i++) {
+                int tmpLengthOfTheLongestSequence = 1;
+                int tmpNumberOfJokers = numberOfJokers;
+                int stepOfSequence = 1;
+                int currentIndex = i;
+                while (currentIndex < cardsValue.size() - 1) {
+                    if (cardsValue.get(currentIndex + 1) == cardsValue.get(currentIndex) + stepOfSequence) {
+                        tmpLengthOfTheLongestSequence += 1;
+                        stepOfSequence = 1;
+                        currentIndex++;
+                    } else if (tmpNumberOfJokers > 0) {
+                        tmpLengthOfTheLongestSequence += 1;
+                        tmpNumberOfJokers--;
+                        stepOfSequence++;
+                    } else {
+                        break;
+                    }
+                }
+                tmpLengthOfTheLongestSequence += tmpNumberOfJokers;
+                if (tmpLengthOfTheLongestSequence > lengthOfTheLongestSequence) {
+                    lengthOfTheLongestSequence = tmpLengthOfTheLongestSequence;
                 }
             }
-            tmpLengthOfTheLongestSequence += tmpNumberOfJokers;
-            if (tmpLengthOfTheLongestSequence > lengthOfTheLongestSequence) {
-                lengthOfTheLongestSequence = tmpLengthOfTheLongestSequence;
-            }
-        }
+    	}
     }
 
     public static void writeResultToFile() {
