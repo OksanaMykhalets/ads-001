@@ -122,7 +122,7 @@ public class Main {
             fileWriter.close();
         } catch (IOException e) {
             System.out.println("Can't save result.");
-            System.exit(0);
+            System.exit(42);
         }
     }
 
