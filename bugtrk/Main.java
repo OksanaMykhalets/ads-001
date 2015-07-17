@@ -47,9 +47,11 @@ public class Main {
 		long boardWidth = sheetWidth;
 		long boardHeight = sheetHeight;
 
-		BigInteger minimumSquare = BigInteger.valueOf(sheetHeight * sheetWidth
-				* numberOfSheets);
-		BigInteger currentSquare = BigInteger.valueOf(boardWidth * boardHeight);
+		BigInteger minimumSquare = BigInteger.valueOf(sheetHeight * sheetWidth)
+				.multiply(BigInteger.valueOf(numberOfSheets));
+		
+		BigInteger currentSquare = BigInteger.valueOf(boardWidth).multiply(
+				BigInteger.valueOf(boardHeight));
 
 		while (minimumSquare.compareTo(currentSquare) == 1) {
 			if ((boardWidth + sheetWidth) <= (boardHeight + sheetHeight)) {
@@ -57,7 +59,8 @@ public class Main {
 			} else {
 				boardHeight += sheetHeight;
 			}
-			currentSquare = BigInteger.valueOf(boardWidth * boardHeight);
+			currentSquare = BigInteger.valueOf(boardWidth).multiply(
+					BigInteger.valueOf(boardHeight));
 		}
 		minimumBoardSize = Math.max(boardWidth, boardHeight);
 	}
