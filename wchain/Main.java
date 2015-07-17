@@ -67,6 +67,7 @@ public class Main {
 						edge.setEndVertex(lowerVertex);
 						graph.getEdges().add(edge);
 						upperVertex.getOutboundEdges().add(edge);
+						break;
 					}
 				}
 			}
