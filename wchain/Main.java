@@ -1,3 +1,4 @@
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -6,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Scanner;
-import java.util.Map.Entry;
 
 public class Main {
 
@@ -31,8 +31,7 @@ public class Main {
 				String vertexLabel = scanner.next();
 				Vertex vertex = new Vertex();
 				vertex.setLabel(vertexLabel);
-				graph.getVertices().get(vertexLabel.length())
-						.put(vertexLabel, vertex);
+				graph.getVertices().get(vertexLabel.length()).add(vertex);
 			}
 			scanner.close();
 		} catch (FileNotFoundException e) {
@@ -49,19 +48,32 @@ public class Main {
 
 	public static void createLocalGraphsEdges(int upperMapIndex,
 			int lowerMapIndex) {
-		
-		Iterator<Entry<String, Vertex>> upperIterator = graph.getVertices()
-				.get(upperMapIndex).entrySet().iterator();
+
+		Iterator<Vertex> upperIterator = graph.getVertices().get(upperMapIndex)
+				.iterator();
 		while (upperIterator.hasNext()) {
-			Vertex upperVertex = upperIterator.next().getValue();
-			Iterator<Entry<String, Vertex>> lowerIterator = graph.getVertices()
-					.get(lowerMapIndex).entrySet().iterator();
+			Vertex upperVertex = upperIterator.next();
+			Iterator<Vertex> lowerIterator = graph.getVertices()
+					.get(lowerMapIndex).iterator();
 			while (lowerIterator.hasNext()) {
-				Vertex lowerVertex = lowerIterator.next().getValue();
-				for (int i = 0; i < upperVertex.getLabel().length(); i++) {
-					StringBuilder sb = new StringBuilder(upperVertex.getLabel());
-					String possibleCombination = sb.deleteCharAt(i).toString();
-					if (lowerVertex.getLabel().equals(possibleCombination)) {
+				Vertex lowerVertex = lowerIterator.next();
+
+				String upperVertexLabel = upperVertex.getLabel();
+				String lowerVertexLabel = lowerVertex.getLabel();
+				for (int charToIgnore = 0; charToIgnore < upperVertexLabel
+						.length(); charToIgnore++) {
+					boolean isEqual = true;
+					for (int i = 0, j = 0; j < lowerVertexLabel.length(); i++, j++) {
+						if (i == charToIgnore) {
+							i++;
+						}
+						if (upperVertexLabel.charAt(i) != lowerVertexLabel
+								.charAt(j)) {
+							isEqual = false;
+							break;
+						}
+					}
+					if (isEqual == true) {
 						Edge edge = new Edge();
 						edge.setStartVertex(upperVertex);
 						edge.setEndVertex(lowerVertex);
@@ -72,15 +84,16 @@ public class Main {
 				}
 			}
 		}
+
 	}
 
 	public static void getAllVertices() {
 		allVertices = new ArrayList<Vertex>();
 		for (int i = 1; i <= 50; i++) {
-			Iterator<Entry<String, Vertex>> verticesIterator = graph
-					.getVertices().get(i).entrySet().iterator();
+			Iterator<Vertex> verticesIterator = graph.getVertices().get(i)
+					.iterator();
 			while (verticesIterator.hasNext()) {
-				Vertex vertex = verticesIterator.next().getValue();
+				Vertex vertex = verticesIterator.next();
 				allVertices.add(vertex);
 			}
 		}
