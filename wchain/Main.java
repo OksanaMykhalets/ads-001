@@ -1,23 +1,29 @@
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Scanner;
 
 public class Main {
 
 	public static Graph graph;
-	public static ArrayList<Vertex> allVertices;
 	public static int maximalWordsChain;
+	public static ArrayList<HashSet<String>> allWords;
+
+	static {
+		graph = new Graph();
+		allWords = new ArrayList<HashSet<String>>();
+		for (int i = 0; i <= 50; i++) {
+			allWords.add(new HashSet<String>());
+		}
+	}
 
 	public static void main(String[] args) {
 		readVerticesFromFile();
-		createAllGraphsEdges();
-		getAllVertices();
+		createGraph();
 		findMaximalWordChain();
 		writeResultToFile();
 	}
@@ -25,13 +31,10 @@ public class Main {
 	public static void readVerticesFromFile() {
 		try {
 			Scanner scanner = new Scanner(new File("wchain.in"));
-			graph = new Graph();
 			int numberOfVertices = scanner.nextInt();
 			while (scanner.hasNext()) {
-				String vertexLabel = scanner.next();
-				Vertex vertex = new Vertex();
-				vertex.setLabel(vertexLabel);
-				graph.getVertices().get(vertexLabel.length()).add(vertex);
+				String inputWord = scanner.next();
+				allWords.get(inputWord.length()).add(inputWord);
 			}
 			scanner.close();
 		} catch (FileNotFoundException e) {
@@ -40,100 +43,79 @@ public class Main {
 		}
 	}
 
-	public static void createAllGraphsEdges() {
+	public static void createGraph() {
 		for (int i = 50; i > 1; i--) {
-			createLocalGraphsEdges(i, i - 1);
+			findAllSubstrings(i);
 		}
 	}
 
-	public static void createLocalGraphsEdges(int upperMapIndex,
-			int lowerMapIndex) {
-
-		Iterator<Vertex> upperIterator = graph.getVertices().get(upperMapIndex)
-				.iterator();
-		while (upperIterator.hasNext()) {
-			Vertex upperVertex = upperIterator.next();
-			Iterator<Vertex> lowerIterator = graph.getVertices()
-					.get(lowerMapIndex).iterator();
-			while (lowerIterator.hasNext()) {
-				Vertex lowerVertex = lowerIterator.next();
-
-				String upperVertexLabel = upperVertex.getLabel();
-				String lowerVertexLabel = lowerVertex.getLabel();
-				for (int charToIgnore = 0; charToIgnore < upperVertexLabel
-						.length(); charToIgnore++) {
-					boolean isEqual = true;
-					for (int i = 0, j = 0; j < lowerVertexLabel.length(); i++, j++) {
-						if (i == charToIgnore) {
-							i++;
-						}
-						if (upperVertexLabel.charAt(i) != lowerVertexLabel
-								.charAt(j)) {
-							isEqual = false;
-							break;
-						}
+	public static void findAllSubstrings(int upperBucketIndex) {
+		HashSet<String> upperBucket = allWords.get(upperBucketIndex);
+		HashSet<String> lowerBucket = allWords.get(upperBucketIndex - 1);
+		for (String upperBucketWord : upperBucket) {
+			for (int i = 0; i < upperBucketWord.length(); i++) {
+				StringBuilder sb = new StringBuilder(upperBucketWord);
+				String lowerBucketWord = sb.deleteCharAt(i).toString();
+				if (lowerBucket.contains(lowerBucketWord)) {
+					Vertex upperVertex;
+					Vertex lowerVertex;
+					if (graph.vertices.containsKey(upperBucketWord)) {
+						upperVertex = graph.vertices.get(upperBucketWord);
+					} else {
+						upperVertex = new Vertex();
+						graph.vertices.put(upperBucketWord, upperVertex);
 					}
-					if (isEqual == true) {
-						Edge edge = new Edge();
-						edge.setStartVertex(upperVertex);
-						edge.setEndVertex(lowerVertex);
-						graph.getEdges().add(edge);
-						upperVertex.getOutboundEdges().add(edge);
-						break;
+					if (graph.vertices.containsKey(lowerBucketWord)) {
+						lowerVertex = graph.vertices.get(lowerBucketWord);
+					} else {
+						lowerVertex = new Vertex();
+						lowerVertex.isDerived = true;
+						graph.vertices.put(lowerBucketWord, lowerVertex);
+					}
+					if (!upperVertex.derivedVertices.contains(lowerVertex)) {
+						upperVertex.derivedVertices.add(lowerVertex);
 					}
 				}
-			}
-		}
-
-	}
-
-	public static void getAllVertices() {
-		allVertices = new ArrayList<Vertex>();
-		for (int i = 1; i <= 50; i++) {
-			Iterator<Vertex> verticesIterator = graph.getVertices().get(i)
-					.iterator();
-			while (verticesIterator.hasNext()) {
-				Vertex vertex = verticesIterator.next();
-				allVertices.add(vertex);
 			}
 		}
 	}
 
 	public static void findMaximalWordChain() {
-		ArrayList<Vertex> verticesWithoutInboundEdges = allVertices;
-		Iterator<Edge> iterator = graph.getEdges().iterator();
+		ArrayList<Vertex> verticesWithoutInboundEdges = new ArrayList<Vertex>(
+				graph.vertices.values());
+		Iterator<Vertex> iterator = verticesWithoutInboundEdges.iterator();
 		while (iterator.hasNext()) {
-			Vertex endVertex = iterator.next().getEndVertex();
-			verticesWithoutInboundEdges.remove(endVertex);
+			Vertex vertex = iterator.next();
+			if (vertex.isDerived) {
+				iterator.remove();
+			}
 		}
-		for (Vertex vertex : verticesWithoutInboundEdges) {
-			findMaximalWordChainForOneVertex(vertex);
+		if (verticesWithoutInboundEdges.size() == 0) {
+			maximalWordsChain = 1;
+		} else {
+			for (Vertex vertex : verticesWithoutInboundEdges) {
+				findMaximalWordChainForOneVertex(vertex);
+			}
 		}
+
 	}
 
 	public static void findMaximalWordChainForOneVertex(Vertex startVertex) {
-		LinkedList<Vertex> currentLayerVertices = new LinkedList<>();
-		LinkedList<Vertex> nextLayerVertices = new LinkedList<>();
-
+		ArrayList<Vertex> currentLayerVertices = new ArrayList<Vertex>();
+		ArrayList<Vertex> nextLayerVertices = new ArrayList<Vertex>();
 		currentLayerVertices.add(startVertex);
 		int localMaximalWordsChain = 0;
 
 		while (currentLayerVertices.size() > 0) {
 			localMaximalWordsChain++;
-			Iterator<Vertex> vertexIterator = currentLayerVertices.iterator();
-			while (vertexIterator.hasNext()) {
-				Vertex vertex = vertexIterator.next();
-				Iterator<Edge> edgeIterator = vertex.getOutboundEdges()
-						.iterator();
-				while (edgeIterator.hasNext()) {
-					Vertex nextVertex = edgeIterator.next().getEndVertex();
-					nextLayerVertices.add(nextVertex);
+			for (Vertex vertex : currentLayerVertices) {
+				for (Vertex derivedVertex : vertex.derivedVertices) {
+					nextLayerVertices.add(derivedVertex);
 				}
 			}
 			currentLayerVertices = nextLayerVertices;
-			nextLayerVertices = new LinkedList<>();
+			nextLayerVertices = new ArrayList<Vertex>();
 		}
-
 		if (localMaximalWordsChain > maximalWordsChain) {
 			maximalWordsChain = localMaximalWordsChain;
 		}
