@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -19,15 +20,12 @@ public class Main {
 
 	public static void readGraphFromFile() {
 		try {
-			Scanner sc = new Scanner(new File("govern.in"));
+			Scanner sc = new Scanner(new File("06.in"));
 			graph = new Graph();
-
 			int verticesCounter = 0;
-
 			while (sc.hasNext()) {
 				String startVertexStringLabel = sc.next();
 				String endVertexStringLabel = sc.next();
-
 				Vertex startVertex;
 				Vertex endVertex;
 				if (!graph.getVertices().containsKey(startVertexStringLabel)) {
@@ -65,30 +63,30 @@ public class Main {
 			System.exit(42);
 		}
 	}
-	
+
 	public static void topologicalSorting() {
-		LinkedList<Vertex> verticesWithoutInboundEdges = new LinkedList<Vertex>(
-				graph.getVertices().values());
+		HashMap<String, Vertex> verticesWithoutInboundEdgesMap = new HashMap<String, Vertex>(
+				graph.getVertices());
+		LinkedList<Vertex> verticesWithoutInboundEdges = new LinkedList<Vertex>();
 		Iterator<Edge> iterator = graph.getEdges().iterator();
 		while (iterator.hasNext()) {
 			Vertex endVertex = iterator.next().getEndVertex();
-			verticesWithoutInboundEdges.remove(endVertex);
+			verticesWithoutInboundEdgesMap.remove(endVertex.getStringLabel());
+		}
+		for (Vertex vertexWithoutInboundEdges : verticesWithoutInboundEdgesMap
+				.values()) {
+			verticesWithoutInboundEdges.add(vertexWithoutInboundEdges);
 		}
 		dfs(verticesWithoutInboundEdges);
-
 	}
 
-	public static void dfs(
-			LinkedList<Vertex> verticesWithoutInboundEdges) {
-
+	public static void dfs(LinkedList<Vertex> verticesWithoutInboundEdges) {
 		LinkedList<Vertex> stack = verticesWithoutInboundEdges;
 		result = new LinkedList<>();
 		boolean[] isVisited = new boolean[graph.getVertices().size()];
-
 		while (stack.size() > 0) {
 			Vertex currentVertex = stack.peek();
 			isVisited[currentVertex.getIntegerLabel()] = true;
-
 			Iterator<Edge> iterator = currentVertex.getOutboundEdges()
 					.iterator();
 			boolean hasUnvisitedVertex = false;
@@ -97,7 +95,6 @@ public class Main {
 				if (!isVisited[neighboringVertex.getIntegerLabel()]) {
 					hasUnvisitedVertex = true;
 					stack.push(neighboringVertex);
-					break;
 				}
 			}
 			if (!hasUnvisitedVertex) {
@@ -106,24 +103,23 @@ public class Main {
 			}
 		}
 	}
-	
+
 	public static void writeResultToFile() {
-        writeResultToFile("govern.out");
-    }
+		writeResultToFile("govern.out");
+	}
 
-    public static void writeResultToFile(String fileName) {
-        File outputFile = new File(fileName);
-        try {
-            FileWriter fileWriter = new FileWriter(outputFile);
-            fileWriter.write("");
-            for (Vertex vertex : result) {
-            	fileWriter.append(vertex.getStringLabel() + "\n");
-            }
-            fileWriter.close();
-        } catch (IOException e) {
-            System.out.println("Can't save result.");
-            System.exit(42);
-        }
-    }
-
+	public static void writeResultToFile(String fileName) {
+		File outputFile = new File(fileName);
+		try {
+			FileWriter fileWriter = new FileWriter(outputFile);
+			fileWriter.write("");
+			for (Vertex vertex : result) {
+				fileWriter.append(vertex.getStringLabel() + "\n");
+			}
+			fileWriter.close();
+		} catch (IOException e) {
+			System.out.println("Can't save result.");
+			System.exit(42);
+		}
+	}
 }
