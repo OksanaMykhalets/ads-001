@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -63,12 +66,14 @@ public class Main {
 						upperVertex = graph.vertices.get(upperBucketWord);
 					} else {
 						upperVertex = new Vertex();
+						upperVertex.label = upperBucketWord;
 						graph.vertices.put(upperBucketWord, upperVertex);
 					}
 					if (graph.vertices.containsKey(lowerBucketWord)) {
 						lowerVertex = graph.vertices.get(lowerBucketWord);
 					} else {
 						lowerVertex = new Vertex();
+						lowerVertex.label = lowerBucketWord;
 						lowerVertex.isDerived = true;
 						graph.vertices.put(lowerBucketWord, lowerVertex);
 					}
@@ -81,7 +86,7 @@ public class Main {
 	}
 
 	public static void findMaximalWordChain() {
-		ArrayList<Vertex> verticesWithoutInboundEdges = new ArrayList<Vertex>(
+		LinkedList<Vertex> verticesWithoutInboundEdges = new LinkedList<Vertex>(
 				graph.vertices.values());
 		Iterator<Vertex> iterator = verticesWithoutInboundEdges.iterator();
 		while (iterator.hasNext()) {
@@ -101,20 +106,28 @@ public class Main {
 	}
 
 	public static void findMaximalWordChainForOneVertex(Vertex startVertex) {
-		ArrayList<Vertex> currentLayerVertices = new ArrayList<Vertex>();
-		ArrayList<Vertex> nextLayerVertices = new ArrayList<Vertex>();
-		currentLayerVertices.add(startVertex);
 		int localMaximalWordsChain = 0;
-
+		
+		List<Vertex> currentLayerVertices = new LinkedList<Vertex>();
+		List<Vertex> nextLayerVertices = new LinkedList<Vertex>();
+		LinkedHashMap<String, Vertex> allVisitedVertices = new LinkedHashMap<String, Vertex>();
+		
+		currentLayerVertices.add(startVertex);
+		allVisitedVertices.put(startVertex.label, startVertex);
+		
 		while (currentLayerVertices.size() > 0) {
 			localMaximalWordsChain++;
 			for (Vertex vertex : currentLayerVertices) {
 				for (Vertex derivedVertex : vertex.derivedVertices) {
-					nextLayerVertices.add(derivedVertex);
+					if (!allVisitedVertices.containsKey(derivedVertex.label)) {
+						nextLayerVertices.add(derivedVertex);
+						allVisitedVertices.put(derivedVertex.label,
+								derivedVertex);
+					}
 				}
 			}
 			currentLayerVertices = nextLayerVertices;
-			nextLayerVertices = new ArrayList<Vertex>();
+			nextLayerVertices = new LinkedList<Vertex>();
 		}
 		if (localMaximalWordsChain > maximalWordsChain) {
 			maximalWordsChain = localMaximalWordsChain;

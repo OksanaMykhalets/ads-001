@@ -2,6 +2,7 @@ import java.util.ArrayList;
 
 public class Vertex {
 	
+	public String label;
 	public ArrayList<Vertex> derivedVertices;
 	public boolean isDerived;
 
