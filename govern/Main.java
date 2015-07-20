@@ -20,7 +20,7 @@ public class Main {
 
 	public static void readGraphFromFile() {
 		try {
-			Scanner sc = new Scanner(new File("06.in"));
+			Scanner sc = new Scanner(new File("govern.in"));
 			graph = new Graph();
 			int verticesCounter = 0;
 			while (sc.hasNext()) {
