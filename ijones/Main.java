@@ -10,7 +10,7 @@ public class Main {
 	public static char[][] tiles;
 	public static long numberOfPossiblePaths;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		readDataFromFile();
 		calculateNumberOfPossiblePaths();
 		writeResultToFile();
@@ -36,7 +36,7 @@ public class Main {
 	}
 
 	public static void calculateNumberOfPossiblePaths() {
-		int[][] distances = new int[passageHeight][passageWidth];
+		long[][] distances = new long[passageHeight][passageWidth];
 		for (int i = 0; i < passageHeight; i++) {
 			distances[i][0] = 1;
 		}
@@ -55,7 +55,6 @@ public class Main {
 				}
 			}
 		}
-
 		numberOfPossiblePaths = distances[0][passageWidth - 1]
 				+ distances[passageHeight - 1][passageWidth - 1];
 	}
