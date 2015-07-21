@@ -10,7 +10,7 @@ public class Main {
 	public static char[][] tiles;
 	public static long numberOfPossiblePaths;
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		readDataFromFile();
 		calculateNumberOfPossiblePaths();
 		writeResultToFile();
