@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class Main {
+	
 	public static final int LOWERCASE_A = 97;
 	public static final int LOWERCASE_Z = 122;
 	public static int passageWidth;
@@ -27,10 +28,10 @@ public class Main {
 			passageWidth = scanner.nextInt();
 			passageHeight = scanner.nextInt();
 			tiles = new char[passageHeight][passageWidth];
-			for (int i = 0; i < passageHeight; i++) {
-				String row = scanner.next();
-				for (int j = 0; j < passageWidth; j++) {
-					tiles[i][j] = row.charAt(j);
+			for (int row = 0; row < passageHeight; row++) {
+				String stringRow = scanner.next();
+				for (int column = 0; column < passageWidth; column++) {
+					tiles[row][column] = stringRow.charAt(column);
 				}
 			}
 			scanner.close();
@@ -43,47 +44,49 @@ public class Main {
 	public static void calculateNumberOfPossiblePaths() {
 		allPossiblePathsForPreviousColumns = new HashMap<Character, BigInteger>();
 		for (int i = LOWERCASE_A; i <= LOWERCASE_Z; i++) {
-			allPossiblePathsForPreviousColumns.put((char) i,
-					new BigInteger("0"));
+			allPossiblePathsForPreviousColumns.put((char) i, BigInteger.ZERO);
 		}
-		BigInteger[][] distances = new BigInteger[passageHeight][passageWidth];
-		for (int i = 0; i < passageHeight; i++) {
-			for (int j = 0; j < passageWidth; j++) {
-				if (j == 0) {
-					distances[i][j] = new BigInteger("1");
-					BigInteger newPath = allPossiblePathsForPreviousColumns
-							.get(tiles[i][j]).add(BigInteger.ONE);
-					allPossiblePathsForPreviousColumns
-							.put(tiles[i][j], newPath);
-				} else {
-					distances[i][j] = new BigInteger("0");
-				}
-			}
+		for (int row = 0; row < passageHeight; row++) {
+			BigInteger newPath = allPossiblePathsForPreviousColumns.get(
+					tiles[row][0]).add(BigInteger.ONE);
+			allPossiblePathsForPreviousColumns.put(tiles[row][0], newPath);
+		}
+		
+		BigInteger[] previousDistances = new BigInteger[passageHeight];
+		BigInteger[] nextDistances = new BigInteger[passageHeight];
+		for (int row = 0; row < passageHeight; row++) {
+			previousDistances[row] = BigInteger.ONE;
+			nextDistances[row] = BigInteger.ZERO;
 		}
 
 		for (int column = 1; column < passageWidth; column++) {
 			for (int row = 0; row < passageHeight; row++) {
 				char currentTile = tiles[row][column];
+				nextDistances[row] = allPossiblePathsForPreviousColumns
+						.get(currentTile);
 				if (currentTile != tiles[row][column - 1]) {
-					distances[row][column] = distances[row][column - 1];
+					nextDistances[row] = nextDistances[row]
+							.add(previousDistances[row]);
 				}
-				distances[row][column] = distances[row][column]
-						.add(allPossiblePathsForPreviousColumns
-								.get(currentTile));
 			}
+
 			for (int row = 0; row < passageHeight; row++) {
 				char currentTile = tiles[row][column];
 				BigInteger newPath = allPossiblePathsForPreviousColumns.get(
-						currentTile).add(distances[row][column]);
+						currentTile).add(nextDistances[row]);
 				allPossiblePathsForPreviousColumns.put(currentTile, newPath);
 			}
-		}
-		numberOfPossiblePaths = distances[0][passageWidth - 1];
-		if (distances.length > 1) {
-			numberOfPossiblePaths = numberOfPossiblePaths
-					.add(distances[passageHeight - 1][passageWidth - 1]);
+
+			BigInteger[] tmpArray = previousDistances;
+			previousDistances = nextDistances;
+			nextDistances = tmpArray;
 		}
 
+		numberOfPossiblePaths = previousDistances[0];
+		if (previousDistances.length > 1) {
+			numberOfPossiblePaths = numberOfPossiblePaths
+					.add(previousDistances[passageHeight - 1]);
+		}
 	}
 
 	public static void writeResultToFile() {
